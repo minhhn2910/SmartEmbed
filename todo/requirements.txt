@@ -12,7 +12,7 @@ Flask
 WTForms
 
 ## Install gensim ##
-gensim
+gensim==3.8.3
 
 ## Install SciPy ##
 scipy

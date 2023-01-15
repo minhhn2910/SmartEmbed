@@ -21,7 +21,7 @@ def save_to_file(messagecontent):
         os.makedirs('./USERINPUT')
     with open('./USERINPUT/current.sol', 'w') as handle:
         handle.write(messagecontent)
-        
+
 def parser():
     # cmd = "java -classpath ./State_Parse/antlr4.jar:./State_Parse/target/ Tokenize ./Bug/current.sol ./Bug/"
     cmd = "java -classpath ../statement_level/Parse/antlr4.jar:../statement_level/Parse/target/ Tokenize ./USERINPUT/current.sol ./STATEMENT_RESULT/"
@@ -31,7 +31,7 @@ def parser():
 
 def normalizer():
     # print("entering normalizer...")
-    sn = Statement_Norm("./STATEMENT_RESULT/")    
+    sn = Statement_Norm("./STATEMENT_RESULT/")
     return sn.linespan_list, sn.statement_tokens_norm
     pass
 
@@ -66,11 +66,11 @@ def get_bugs_cat(user_in, display_these_bugs, bug_types):
     # print(norm_result)
     vec_result = vectorizer(norm_result)
     # print("vec_result")
-    # print(type(vec_result), vec_result.shape)
+    # print(type(vec_result), vec_result)
     embedding_type = 'sum_fasttext'
 
     top_bug = np.empty((0,3))
-    
+
     for bind, b in enumerate(display_these_bugs):
 
         bug_database_path = "../statement_level/Embedding/"
@@ -79,24 +79,28 @@ def get_bugs_cat(user_in, display_these_bugs, bug_types):
         similarity_list = []
         for v in vulnerable_fasttext_embedding:
             similarity_array = get_similarity(v, vec_result)
+            # if (bind == 1):
+            #     print (similarity_array)
             similarity_list.append(similarity_array)
 
         similarity_matrix = np.vstack(similarity_list)
         # print(b)
         # print("similarity matrix", type(similarity_matrix), similarity_matrix.shape)
-        try:
-            top_bug_idx = np.where(similarity_matrix>0.85)
-            if np.max(similarity_matrix) > 0.85:
-                for ct, k in enumerate(top_bug_idx[1]):
-                    # get the line index index 
-                    tmp = map(int, norm_result[0][k])
-                    tmp.append(bug_types.index(b))
-                    tmp = np.array(tmp)
-                    top_bug = np.append(top_bug,tmp.reshape(1,3),axis=0)
-                    # print(top_bug)
-                    if (ct==3):break
-        except:
-            continue
+
+
+        top_bug_idx = np.argwhere(similarity_matrix>0.85)
+        print (top_bug_idx)
+        if len(top_bug_idx) > 0:
+            print (top_bug_idx)
+            for ct, k in enumerate(top_bug_idx[1]):
+                # get the line index index
+                tmp = list(map(int, norm_result[0][k]))
+                tmp.append(bug_types.index(b))
+                tmp = np.array(tmp)
+                top_bug = np.append(top_bug,tmp.reshape(1,3),axis=0)
+                # print(top_bug)
+                if (ct==3):break
+
     # print(top_bug.shape)
     return top_bug.tolist()
 

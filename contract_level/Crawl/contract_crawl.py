@@ -7,7 +7,7 @@ import json
 import sys
 
 class Contract_Detail(object):
-    
+
     def __init__(self, contract_addr):
         self.contract_addr = contract_addr
         self.base_dir = './' + str(contract_addr)
@@ -18,33 +18,33 @@ class Contract_Detail(object):
     def get_parse_html(self, write2file=False):
         '''
             get details of a given smart contract
-            Parameters : contract_addr, smart contract address 
+            Parameters : contract_addr, smart contract address
             return : parse_html
         '''
 
         '''
         if os.path.exists(self.base_dir + '/parse.html'):
             with open(self.base_dir + '/parse.html', 'r') as pt:
-                raw_html = pt.read() 
+                raw_html = pt.read()
                 parse_html = etree.HTML(raw_html)
                 return parse_html
         '''
         base_url = 'https://etherscan.io/address/'
-        target_url = str(base_url) + str(self.contract_addr) + str('#code') 
+        target_url = str(base_url) + str(self.contract_addr) + str('#code')
         raw_html = crawl_url_by_get(target_url, proxy=None)
         parse_html = etree.HTML(raw_html)
         if write2file:
             with open(self.base_dir + '/parse.html', 'w') as parse:
                 parse.write( etree.tostring(parse_html) )
         return parse_html
-    
+
     def get_basic_info(self):
         '''
             extract basic info from a given html
-            Parameters : 
-            return : basic_info, dict, 
+            Parameters :
+            return : basic_info, dict,
                      {
-                        'contract_name' : ..., 
+                        'contract_name' : ...,
                         'eth_balance' : ...,
                         'eth_usd_value' : ...,
                         'no_of_trans' : ...,
@@ -52,7 +52,7 @@ class Contract_Detail(object):
         '''
         basic_info = {}
         cleanr = re.compile('<.*?>')
-        
+
         table_2_key = self.parse_html.xpath("//div[@id='ContentPlaceHolder1_contractCodeDiv']//table//td[1]")
         table_2_value = self.parse_html.xpath("//div[@id='ContentPlaceHolder1_contractCodeDiv']//table//td[2]")
         table_2_dict = {}
@@ -75,25 +75,25 @@ class Contract_Detail(object):
             basic_info['contract_name'] = table_2_dict['ContractName:']
 
         if 'Balance:' in table_1_dict:
-            basic_info['eth_balance'] = table_1_dict['Balance:'] 
+            basic_info['eth_balance'] = table_1_dict['Balance:']
         elif 'ETHBalance:' in table_2_dict:
-            basic_info['eth_balance'] = table_1_dict['ETHBalance:'] 
+            basic_info['eth_balance'] = table_1_dict['ETHBalance:']
 
         if 'EtherValue:' in table_1_dict:
-            basic_info['eth_usd_value'] = table_1_dict['EtherValue:'] 
+            basic_info['eth_usd_value'] = table_1_dict['EtherValue:']
         elif 'ETHUSDValue:' in table_1_dict:
-            basic_info['eth_usd_value'] = table_1_dict['ETHUSDValue:'] 
+            basic_info['eth_usd_value'] = table_1_dict['ETHUSDValue:']
 
         if 'Transactions:' in table_1_dict:
-            basic_info['no_of_trans'] = table_1_dict['Transactions:'] 
+            basic_info['no_of_trans'] = table_1_dict['Transactions:']
         elif 'NoOfTransactions:' in table_1_dict:
-            basic_info['no_of_trans'] = table_1_dict['NoOfTransactions:'] 
+            basic_info['no_of_trans'] = table_1_dict['NoOfTransactions:']
 
         if 'TokenContract:' in table_1_dict:
             basic_info['token_contract'] = table_1_dict['TokenContract:']
         elif 'TokenContract(ERC20):' in table_1_dict:
             basic_info['token_contract'] = table_1_dict['TokenContract(ERC20):']
-        
+
         if 'ContractCreator:' in table_1_dict:
             basic_info['creator_address'] = table_1_dict['ContractCreator:'].split(' txn ')[0]
             basic_info['creator_transaction'] = table_1_dict['ContractCreator:'].split(' txn ')[1]
@@ -105,7 +105,7 @@ class Contract_Detail(object):
         # with open(self.base_dir + '/basic_info', 'w') as bi:
         #     bi.write( str(basic_info) )
         return basic_info
-        
+
 
     def get_source_code(self):
         '''
@@ -124,7 +124,7 @@ class Contract_Detail(object):
     def get_contract_abi(self):
         '''
             get contract ABI from api call 'https://api.etherscan.io/api?module=contract&action=getabi&address='
-            Parameters : contract_addr 
+            Parameters : contract_addr
             return : file of contract abi
         '''
         target_url = 'https://api.etherscan.io/api?module=contract&action=getabi'\
@@ -175,9 +175,9 @@ class Contract_Detail(object):
             self.get_basic_info()
             # return basic_info, True
             return True
-        except Exception, ex:
-#             print 'get_contract_detail（） -------- ', str(ex) 
+        except Exception as ex:
+#             print 'get_contract_detail（） -------- ', str(ex)
             # return None, False
             return False
- 
+
 

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import urllib
-import urllib2
+# import urllib2
 import random
 
 USER_AGENT_LIST = [
@@ -22,20 +22,20 @@ USER_AGENT_LIST = [
         "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",\
         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3",\
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",\
-        "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"                
+        "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"
 ]
 
 
 # 使用代理访问网站 - GET方式实现
 def crawl_url_by_get(url, proxy=None, enable_proxy=False):
-    
-    # make a string with 'GET'  
+
+    # make a string with 'GET'
     method = 'GET'
-    
-    # create a handler 
+
+    # create a handler
     proxy_handler = urllib2.ProxyHandler(proxy)
-    null_proxy_handler = urllib2.ProxyHandler({}) 
-    
+    null_proxy_handler = urllib2.ProxyHandler({})
+
     # create an openerdirector instance according to enable_proxy
     if enable_proxy:
         cookies = urllib2.HTTPCookieProcessor()
@@ -44,19 +44,19 @@ def crawl_url_by_get(url, proxy=None, enable_proxy=False):
     else :
         opener = urllib2.build_opener(null_proxy_handler)
         # print 'without using proxy to crawl pages', url
-    
-    # install opener 
+
+    # install opener
     urllib2.install_opener(opener)
-    
-    # buidl a request 
+
+    # buidl a request
     request = urllib2.Request(url)
-    
-    # Umcomment the below line for ramdom choose the user_agent 
+
+    # Umcomment the below line for ramdom choose the user_agent
     # user_agent = random.choice(USER_AGENT_LSIT)
-    user_agent = USER_AGENT_LIST[1] 
+    user_agent = USER_AGENT_LIST[1]
     request.add_header('User-Agent', user_agent)
     request.get_method = lambda:method
-    
+
     try :
         connection = opener.open(request, timeout=5)
         if connection.code == 200:
@@ -64,19 +64,19 @@ def crawl_url_by_get(url, proxy=None, enable_proxy=False):
             return html
         else :
             return None
-    except urllib2.HTTPError, ex:
+    except urllib2.HTTPError as ex:
         # print e.code, e.reason
-        print 'spider_url_by_get（） -------- ', str(ex) 
+        print ('spider_url_by_get（） -------- ', str(ex))
         connection = ex
         return None
-    except urllib2.URLError, ex:
+    except urllib2.URLError as ex:
         # print e.reason
         # print e.code, e.reason
-        print 'spider_url_by_get（） -------- ', str(ex) 
+        print ('spider_url_by_get（） -------- ', str(ex))
         # remove_proxy(proxy)
         return None
-    except Exception, ex:
-        print 'spider_url_by_get（） -------- ', str(ex) 
+    except Exception as ex:
+        print ('spider_url_by_get（） -------- ', str(ex))
         # remove_proxy(proxy)
         return None
 
