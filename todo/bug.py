@@ -89,7 +89,7 @@ def get_bugs_cat(user_in, display_these_bugs, bug_types):
 
 
         top_bug_idx = np.argwhere(similarity_matrix>0.85)
-        print (top_bug_idx)
+        # print (top_bug_idx)
         if len(top_bug_idx) > 0:
             print (top_bug_idx)
             for ct, k in enumerate(top_bug_idx[1]):
